@@ -13,7 +13,7 @@ Mycroft.ProportionalDelegate {
         Layout.columnSpan: 2
         wrapMode: Text.WordWrap
         font.capitalization: Font.AllUppercase
-        text: "Astronomy Picture of the Day"
+        text: "Chandra X-ray Observatory"
     }
     AnimatedImage {
         id: img
