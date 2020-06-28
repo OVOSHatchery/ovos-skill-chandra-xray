@@ -19,7 +19,7 @@ Mycroft.ProportionalDelegate {
         id: img
         Layout.alignment: Qt.AlignHCenter
         Layout.preferredWidth: 400
-        fillMode: Image.PreserveAspectCrop
+        fillMode: Image.Stretch
         source: sessionData.imgLink
     }
 }

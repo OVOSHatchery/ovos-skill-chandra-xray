@@ -49,7 +49,7 @@ class ChandraXRaySkill(MycroftSkill):
         self.gui['url'] = self.settings['url']
         self.set_context("ChandraXRay")
 
-    @resting_screen_handler("ChandraXRay - Latest")
+    @resting_screen_handler("ChandraXRay")
     def idle(self, message):
         self.update_picture(not self.settings["random"])
         self.gui.clear()
@@ -58,9 +58,9 @@ class ChandraXRaySkill(MycroftSkill):
     # intents
     @intent_file_handler("about.intent")
     def handle_about_chandra_intent(self, message):
-        epic = join(dirname(__file__), "ui", "images", "chandra.jpg")
+        picture = join(dirname(__file__), "ui", "images", "chandra.jpg")
         utterance = self.dialog_renderer.render("aboutChandra", {})
-        self.gui.show_image(epic, override_idle=True,
+        self.gui.show_image(picture, override_idle=True,
                             fill='PreserveAspectFit', caption=utterance)
         self.speak(utterance, wait=True)
         sleep(1)
