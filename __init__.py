@@ -1,16 +1,18 @@
-from mycroft import MycroftSkill, intent_file_handler, intent_handler
-from mycroft.skills.core import resting_screen_handler
-from adapt.intent import IntentBuilder
-from mtranslate import translate
-import feedparser
 import random
-from time import sleep
 from os.path import join, dirname
+from time import sleep
+
+import feedparser
+from ovos_workshop.decorators import intent_handler
+from ovos_workshop.decorators import resting_screen_handler
+from ovos_workshop.intents import IntentBuilder
+from ovos_workshop.skills import OVOSSkill
 
 
-class ChandraXRaySkill(MycroftSkill):
-    def __init__(self):
-        super(ChandraXRaySkill, self).__init__(name="ChandraXRaySkill")
+class ChandraXRaySkill(OVOSSkill):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if "random" not in self.settings:
             # idle screen, random or latest
             self.settings["random"] = False
@@ -28,8 +30,8 @@ class ChandraXRaySkill(MycroftSkill):
             title = e["title"]
             imgLink = None
             if not self.lang.lower().startswith("en"):
-                summary = translate(summary, self.lang)
-                title = translate(title, self.lang)
+                summary = self.translator.translate(summary, self.lang)
+                title = self.translator.translate(title, self.lang)
 
             for link in e["links"]:
                 if link["type"] == 'image/jpeg':
@@ -56,17 +58,19 @@ class ChandraXRaySkill(MycroftSkill):
         self.gui.show_page('idle.qml')
 
     # intents
-    @intent_file_handler("about.intent")
+    @intent_handler("about.intent")
     def handle_about_chandra_intent(self, message):
         picture = join(dirname(__file__), "ui", "images", "chandra.jpg")
         utterance = self.dialog_renderer.render("aboutChandra", {})
-        self.gui.show_image(picture, override_idle=True,
-                            fill='PreserveAspectFit', caption=utterance)
+        self.gui.show_image(picture,
+                            override_idle=True,
+                            fill='PreserveAspectFit',
+                            caption=utterance)
         self.speak(utterance, wait=True)
         sleep(1)
         self.gui.clear()
 
-    @intent_file_handler('chandraxray.intent')
+    @intent_handler('chandraxray.intent')
     def handle_pod(self, message):
         if self.voc_match(message.data["utterance"], "latest"):
             self.update_picture(True)
@@ -79,16 +83,14 @@ class ChandraXRaySkill(MycroftSkill):
 
         self.speak(self.settings['title'])
 
-    @intent_handler(IntentBuilder("ExplainIntent")
-                    .require("ExplainKeyword").require("ChandraXRay"))
+    @intent_handler(
+        IntentBuilder("ExplainIntent").require("ExplainKeyword").require(
+            "ChandraXRay"))
     def handle_explain(self, message):
-        self.gui.show_image(self.settings['imgLink'], override_idle=True,
+        self.gui.show_image(self.settings['imgLink'],
+                            override_idle=True,
                             fill='PreserveAspectFit',
                             caption=self.settings['summary'])
         self.speak(self.settings['summary'], wait=True)
         sleep(1)
         self.gui.clear()
-
-
-def create_skill():
-    return ChandraXRaySkill()
